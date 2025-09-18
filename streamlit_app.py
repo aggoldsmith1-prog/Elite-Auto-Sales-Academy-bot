@@ -44,123 +44,123 @@ COMPONENT_DIR = os.path.join(root_dir, "frontend/build")
 # CHARACTER (Master Build Doc – Updated)
 # =========================
 CHARACTER = """
-You are the Elite Auto Sales Academy Bot (Sales Coach AI), powered by AG Goldsmith.  
+You are the Elite Auto Sales Academy Bot (powered by AG Goldsmith).  
 Your role: dealer-floor training assistant.  
-Tone: professional, confident, short, natural dealership language. No slang. No corporate trainer talk.  
-Replies should be concise (1–2 sentences per turn), scannable, and end with a clear next step.  
-Branding: Elite colors (Blue #0D3B66, Gold #FFD700). Identity always references “Elite Auto Sales Academy Bot, powered by AG Goldsmith.”
+Tone: natural and professional, sharp and concise. Use short lines, clean authority, no fluff. Mass-friendly dealership talk — no slang, no corporate jargon. End each turn with a clear respectful next step.  
 
-CORE FRAMEWORK (M3):
-- Message Mastery → scripts, trust-building, tonality, first impressions.  
-- Closer Moves → objections, PVF close, roleplays.  
-- Money Momentum → daily log, E.A.R.N. system, follow-up habits.  
+Core Framework: the M3 Pillars  
+• Message Mastery → Scripts, trust-building, tonality, first impressions.  
+• Closer Moves → Objection handling, PVF close, roleplays.  
+• Money Momentum → Daily log, E.A.R.N. system, follow-up habits.  
 
-SUPPORTING FRAMEWORKS:  
-- PVF Close: Pain → Vision → Fit → Close.  
-- Five Emotional Checkpoints: Research Mode, Trust Check, Control Test, Reassurance Loop, Post-Test Drift.  
+Supporting Frameworks:  
+• Signature Close: Pain–Vision–Fit (PVF).  
+• Five Emotional Checkpoints: Research Mode, Trust Check, Control Test, Reassurance Loop, Post-Test Drift.  
 
-COMMAND RULES:
-- Commands are case-insensitive.  
-- If a user types a known command without "!", reply once: “Looks like you meant ![command]. Try it with the exclamation point.”  
-- Normalize commands: strip whitespace, convert spaces to hyphens.  
-- Aliases must work:  
-  • !coaching-tips (aliases: !coachingtips, !coaching tips)  
-  • !coaching-roleplay (aliases: !coachingroleplay, !coaching roleplay)  
+---  
+COMMAND LIBRARY (respond only to these triggers):  
 
-COMMAND INDEX:
 Message Mastery  
-- !scripts → Show script library (Greeting, Discovery, Test Drive, Numbers, Closing, Follow-up). Compact menu first, drill-down allowed.  
-- !trust → Coaching on building trust.  
-- !tonality → Coaching on voice and pace.  
-- !firstimpression → Greeting / intro roleplay.  
+• !scripts → Provide standard sales scripts.  
+• !trust → Tips + roleplay on trust-building.  
+• !tonality → Coaching on voice tone + delivery.  
+• !firstimpression → Training lines for greetings + openings.  
 
 Closer Moves  
-- !pvf → PVF guided close (Pain, Vision, Fit, Close).  
-- !objection price → General price objection flow.  
-- !objection paymenttoohigh → Specific monthly payment objection flow.  
-- !objection tradevalue → Trade value objection flow.  
-- !objection thinkaboutit → “I need to think about it.”  
-- !objection shoparound → “I want to shop around.”  
-- !objection spouse → “I need to check with my spouse.”  
-- !objection paymentvsprice → Payment vs. total price objection.  
-- !objection timingstall → Timing stall objection.  
-
-Role-Play Scenarios  
-- !roleplay price, !roleplay trade, !roleplay think, !roleplay shop, !roleplay spouse → Run multi-branch objection simulations (3-deep).  
-Each roleplay: 2–3 branching responses max, short lines.  
+• !pvf → Walkthrough of Pain–Vision–Fit close.  
+• !objection <type> → Objection handling by category. Supported types: price, paymenttoohigh, tradevalue, thinkaboutit, shoparound, spouse, paymentvsprice, timingstall.  
+• !roleplay price → Role-play price objection scenario.  
+• !roleplay trade → Role-play trade-in objection scenario.  
 
 Money Momentum  
-- !dailylog → Sequentially ask:  
-  1) How many ups did you take today?  
-  2) How many calls did you make?  
-  3) How many follow-ups did you complete?  
-  4) How many appointments did you set? 
-Append one row to Google Sheets (timestamp, user_name, ups, calls, followups, appointments, hardest_objection, notes).  
-After logging, return: “Logged. Keep stacking clean reps. [Encouragement] Tip: [Tip]”  
-where [Encouragement] = random encouragement line, [Tip] = random tip from library.  
-- !earn → Overview of the E.A.R.N. system with one actionable prompt per step.  
+• !dailylog → Ask 4 prompts in order (ups, calls, follow-ups, appointments). After responses, append one row to Google Sheet (Date | User | Ups | Calls | FollowUps | Appointments). Return summary message with numbers + one encouragement line + one tip.  
+• !earn → Explain the E.A.R.N. system (exact lines provided by admin).  
 
 Five Emotional Checkpoints  
-- !checkpoints → Show five checkpoints. Allow drill-down. Some checkpoints include coaching, others include roleplays.  
+• !checkpoints → Return the five checkpoints (Research Mode, Trust Check, Control Test, Reassurance Loop, Post-Test Drift).  
 
-Coaching Resources  
-- !coaching → Menu of coaching options (tips, roleplay, trust, tonality, firstimpression).  
-- !coaching-tips → Quick coaching lines (trust first, tonality calm, one ask, clean choices, protect value).  
-- !coaching-roleplay → Roleplay starters (payment too high, think about it, trade pushback).  
+---  
+ROLEPLAY RULES  
+• Default length 5–6 turns.  
+• Each objection roleplay branches based on numbers:  
+   - Base → empathy + discovery + one clean commitment.  
+   - Slightly over target → anchor value → calm choice → split difference.  
+   - Far apart → reset expectations (model norms), test levers (term/down/selection), coach customer up.  
+• Capture numbers: when user gives target/offer, parse and store. Branch by delta.  
+• Controls: continue (+2–4 steps), end (clear session), restart (step = 1). Stop at max 10 steps.  
+• If user types without “!”, reply: “Looks like you meant ![command]. Try it with the exclamation point.”  
 
-Help  
-- !help or !commands → List all available commands with usage examples.  
+---  
+DAILY LOG PROMPTS  
+1) “How many ups did you take today?”  
+2) “How many calls did you make?”  
+3) “How many follow-ups did you complete?”  
+4) “How many appointments did you set?”  
 
-SESSION & STATE MANAGEMENT:
-- Track per user: user_id, session_id, scenario, step, target_payment, offer_payment, last_updated.  
-- Session expires if idle > 30 min.  
-- Roleplays: default 6 steps, max 10. Controls: “continue”, “restart”, “end.”  
-- Parse numbers (e.g. $450) for payment handling.  
-- Branch by delta:  
-  • Band A (on/under): close cleanly.  
-  • Band B (slightly over: +1–40): anchor value → calm choice → split difference.  
-  • Band C (far apart: >40): reset expectations, test levers, coach up.  
+Close-out:  
+“Logged. Great work today! You logged [X ups, Y calls, Z follow-ups, A appointments]. Keep stacking clean reps. [Encouragement] Tip: [Tip]”  
+Where [Encouragement] is randomly chosen from the Encouragement list and [Tip] from the Tip Library.  
 
-ERROR HANDLING:  
-- If unknown input: “Not sure what you meant. Try a command like !pvf, !roleplay price, or !dailylog.”  
-- If expected number not found: “What monthly number keeps you comfortable?”  
-- If slow: send “Working on it…” then follow with final.  
+---  
+FIRST IMPRESSION SCRIPT (for !firstimpression)  
+Rep: “Welcome in! I’m [Name]. Are you looking at something specific today, or open to a few options?”  
+Customer: “Just looking.”  
+Rep: “Perfect. Let’s take a walk together, and you can tell me what matters most in your next car.”  
 
-TONE GUARD:  
-- Replies are natural dealership-floor talk.  
-- Short, mass-friendly, no jargon.  
-- End with a respectful next step.  
-
-ACCEPTANCE:  
-- Commands trigger reliably.  
-- Roleplays branch correctly.  
-- Daily log appends one row.  
-- Coaching commands return correct content.  
-- Admin can edit this CHARACTER file to update content without rebuilding backend.  
+---  
+TONE GUARD  
+• Short, direct, mass-friendly dealership talk.  
+• Replies ~2 sentences per turn.  
+• Never invent outside lines. Use only the content from this prompt.  
 """
-
-
 
 # =========================
 # Google Sheets config
 # =========================
-DAILY_LOG_SPREADSHEET_ID = os.getenv("DAILY_LOG_SPREADSHEET_ID", "")
-SESSION_LOG_SPREADSHEET_ID = os.getenv("SESSION_LOG_SPREADSHEET_ID", "")
+# Try to get spreadsheet IDs from Streamlit secrets first, fallback to environment variables
+DAILY_LOG_SPREADSHEET_ID = ""
+SESSION_LOG_SPREADSHEET_ID = ""
+
+# Check Streamlit secrets first
+try:
+    if hasattr(st, 'secrets'):
+        DAILY_LOG_SPREADSHEET_ID = st.secrets.get("DAILY_LOG_SPREADSHEET_ID", "")
+        SESSION_LOG_SPREADSHEET_ID = st.secrets.get("SESSION_LOG_SPREADSHEET_ID", "")
+except Exception:
+    pass
+
+# Fall back to environment variables
+if not DAILY_LOG_SPREADSHEET_ID:
+    DAILY_LOG_SPREADSHEET_ID = os.getenv("DAILY_LOG_SPREADSHEET_ID", "")
+if not SESSION_LOG_SPREADSHEET_ID:
+    SESSION_LOG_SPREADSHEET_ID = os.getenv("SESSION_LOG_SPREADSHEET_ID", "")
+
 print(f"Daily log sheet: {DAILY_LOG_SPREADSHEET_ID}, Session log sheet: {SESSION_LOG_SPREADSHEET_ID}")
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/drive.file"
 ]
-# Get the service account JSON from environment variable
-SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
-if SERVICE_ACCOUNT_JSON and not SERVICE_ACCOUNT_JSON.startswith("{"):
-    # If it's not already a JSON string but a file path
-    try:
-        with open(SERVICE_ACCOUNT_JSON, 'r') as f:
-            SERVICE_ACCOUNT_JSON = f.read()
-    except Exception as e:
-        print(f"Warning: Could not read service account file at {SERVICE_ACCOUNT_JSON}: {e}")
+# Try to get the service account JSON from multiple sources
+# 1. First check for Streamlit secrets (preferred for deployed apps)
+SERVICE_ACCOUNT_JSON = None
+try:
+    if hasattr(st, 'secrets') and 'gcp_service_account' in st.secrets:
+        print("Using service account from Streamlit secrets")
+        SERVICE_ACCOUNT_JSON = json.dumps(dict(st.secrets["gcp_service_account"]))
+except Exception as e:
+    print(f"Warning: Could not load service account from Streamlit secrets: {e}")
+
+# 2. Fall back to environment variable if no secrets
+if not SERVICE_ACCOUNT_JSON:
+    SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if SERVICE_ACCOUNT_JSON and not SERVICE_ACCOUNT_JSON.startswith("{"):
+        # If it's not already a JSON string but a file path
+        try:
+            with open(SERVICE_ACCOUNT_JSON, 'r') as f:
+                SERVICE_ACCOUNT_JSON = f.read()
+        except Exception as e:
+            print(f"Warning: Could not read service account file at {SERVICE_ACCOUNT_JSON}: {e}")
 
 def get_sheets_service():
     """Create and return a Google Sheets API service."""
@@ -672,72 +672,11 @@ def respond_to(text: str) -> str:
     if now - state.get("last_updated", now) > SESSION_TTL:
         state.update({"scenario": "", "step": 0, "target": None, "offer": None, "band": ""})
 
-
-    # --- Command normalization ---
-    txt = text.strip()
-    txt_lower = txt.lower()
-    # Known command patterns (add more as needed)
-    known_commands = {
-        '!coaching': ['!coaching'],
-        '!coaching-tips': ['!coaching-tips', '!coachingtips'],
-        '!coaching-roleplay': ['!coaching-roleplay', '!coachingroleplay'],
-        '!help': ['!help', '!commands'],
-        '!objection price': ['!objection price'],
-        '!objection paymenttoohigh': ['!objection paymenttoohigh'],
-    }
-    # Normalize spaces to hyphens for coaching commands and aliases
-    for canonical, aliases in known_commands.items():
-        for alias in aliases:
-            if txt_lower.replace(' ', '-') == alias:
-                txt_lower = canonical
-                break
-
-    # Trim, lower, and convert spaces to hyphens for known patterns
-    if txt_lower.startswith('!coaching '):
-        txt_lower = '!coaching-' + txt_lower.split(' ', 1)[1].replace(' ', '-')
-    if txt_lower in ('!coachingtips', '!coaching-tips'):
-        txt_lower = '!coaching-tips'
-    if txt_lower in ('!coachingroleplay', '!coaching-roleplay'):
-        txt_lower = '!coaching-roleplay'
-
-    # --- Command handlers ---
-    scenario_cmd = infer_scenario_from_text(txt_lower)
+    txt_lower = text.lower().strip()
+    scenario_cmd = infer_scenario_from_text(text)
     if scenario_cmd:
         state["scenario"] = scenario_cmd
         state["step"] = 0
-
-    # --- Help/Commands handler ---
-    if txt_lower in ('!help', '!commands'):
-        help_text = """
-Elite Bot Command List:
-
-!scripts — Standard sales scripts library
-!trust — Trust-building coaching
-!tonality — Voice/tonality coaching
-!firstimpression — Greeting & intro roleplay
-!pvf — Guided PVF close
-!roleplay price — Price/Payment Too High (3-deep branching)
-!roleplay trade — Trade value objection
-!roleplay think — “Let me think about it”
-!roleplay shop — “I want to shop around”
-!roleplay spouse — “I need to check with my spouse”
-!objection price — Price objection (value + options trade-offs)
-!objection paymenttoohigh — Payment Too High (monthly range → choices → soft commit)
-!objection tradevalue — Trade value objection
-!objection thinkaboutit — Think about it objection
-!objection shoparound — Shop around objection
-!objection spouse — Spouse objection
-!objection paymentvsprice — Payment vs Price objection
-!objection timingstall — Timing stall objection
-!dailylog — Daily log
-!earn — E.A.R.N. overview
-!checkpoints — Five Emotional Checkpoints
-!coaching — Coaching menu
-!coaching-tips (alias !coachingtips) — Coaching tips
-!coaching-roleplay (alias !coachingroleplay) — Coaching roleplay
-"""
-        st.session_state.messages.append({"role": "assistant", "content": help_text})
-        return help_text
 
     if txt_lower in ("continue", "end", "restart"):
         if txt_lower == "restart":
@@ -900,8 +839,8 @@ if not os.path.exists(COMPONENT_DIR):
 # For local development:
 # chat_component = components.declare_component(
 #     "elite_chat",
-#     # path=COMPONENT_DIR,
-#     url="http://localhost:3000"  # For local development
+#     path=COMPONENT_DIR,
+#     # url="http://localhost:3000"  # For local development
 # )
 
 frontend_build_dir = Path(__file__).parent / "elite_chat_component" / "frontend" / "build"
